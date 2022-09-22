@@ -3,9 +3,6 @@ import sys
 import json
 from jsontraverse.parser import JsonTraverseParser
 from os.path import exists
-import pytest
-import re
-
 
 def json_parser(response, *args):
     return_arr = []
