@@ -216,7 +216,7 @@ def process_location(file_path, zip_code):
         gx = location["location"]["gridx"]
         gy = location["location"]["gridy"]
 
-        if wid == "" or gx == "" or gy == "":
+        if wid == "None" or gx == "None" or gy == "None":
             local = get_location_info(zip_code)
             location["location"]["latitude"] = local[0]
             location["location"]["longitude"] = local[1]
@@ -264,8 +264,11 @@ def get_weather_forecast(office_name, grid_x, grid_y):
     arg2 = "properties.periods.0.temperature"
     arg3 = "properties.periods.0.temperatureUnit"
 
-    forecast = json_parser(response, arg1, arg2, arg3)
 
+    forecast = json_parser(response, arg1, arg2, arg3)
+    
+    if forecast == ['None', 'None', 'None']:
+        forecast = ["No response from server, default values", "72", "F"]
     return forecast
 
 
@@ -300,9 +303,11 @@ def main(*args):
             AnyError: If anything bad happens.
     """
     try:
-        zip_code = args[1]
+        zip_code = args[0][1]
         zip_code = zip_code[:5]
-        if !zip_code.isnumeric():
+        if zip_code.isnumeric():
+            pass
+        else:
             zip_code = '10004'
     except IndexError:
         zip_code = '10004'
@@ -320,6 +325,7 @@ def main(*args):
     wfore = get_weather_forecast(station_id, gridx, gridy)
 
     print("Weather is {} based on zip code {}.".format(wfore, zip_code))
+
 
 
 if __name__ == '__main__':
