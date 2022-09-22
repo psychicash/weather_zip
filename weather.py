@@ -3,8 +3,8 @@ import sys
 import json
 from jsontraverse.parser import JsonTraverseParser
 from os.path import exists
-
-
+import pytest
+import re
 
 
 def json_parser(response, *args):
@@ -32,6 +32,8 @@ def get_key():
             key = df
     except:
         pass
+
+    
     return key
 
 
@@ -40,7 +42,7 @@ def get_location_info(zip_code):
     key = get_key()
     
     if key == "":
-        local = ("38", "-85")
+        local = ("40.703", "-74.013")
     else:
         url = "https://google-maps-geocoding.p.rapidapi.com/geocode/json"
         querystring = {"address":str(zip_code),"language":"en"}
@@ -102,7 +104,7 @@ def process_location(file_path, zip_code):
             location_info = json_parser(df, arg1, arg2, arg3, arg4, arg5, arg6)
         except json.decoder.JSONDecodeError: 
             location_info = [zip_code, "", "", "", "", ""]
-            
+        
         location = {
           "location": {
             "zip_code" : location_info[0],
@@ -116,8 +118,8 @@ def process_location(file_path, zip_code):
         if location_info[0] == zip_code:
             pass
         else:
-            location["location"]["zip_code"] = zip_code
-
+            location = create_location(zip_code)
+            
         lt = location["location"]["latitude"]
         lg = location["location"]["longitude"]
         wid = location["location"]["weather_station_id"]
@@ -125,12 +127,9 @@ def process_location(file_path, zip_code):
         gy = location["location"]["gridy"]
 
         if wid  == "" or gx == "" or gy == "":
-            if lt == "" or lg == "":
-                local = get_location_info(zip_code)
-                location["location"]["latitude"] = local[0]
-                location["location"]["longitude"] = local[1]
-            else:
-                local = [lt, lg]
+            local = get_location_info(zip_code)
+            location["location"]["latitude"] = local[0]
+            location["location"]["longitude"] = local[1]
             station_info = get_weather_station_info(local[0], local[1])
             wid = station_info[0]
             gx = station_info[1]
@@ -141,6 +140,8 @@ def process_location(file_path, zip_code):
         return wid, gx, gy
 
 def get_weather_forecast(office_name, grid_x, grid_y):
+    
+    
     url = "https://api.weather.gov/gridpoints/{}/{},{}/forecast".format(office_name, grid_x, grid_y)
 
     response = requests.request("GET", url)
@@ -174,7 +175,7 @@ def main(arguments):
     gridy = query_data[2]
 
     print(get_weather_forecast(station_id, gridx, gridy))
-    pass
+
 
 if __name__ == "__main__":
     main(sys.argv)
