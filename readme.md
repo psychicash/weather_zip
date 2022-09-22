@@ -3,6 +3,10 @@ https://psychicash.github.io/weather_zip/
 
 Retrieves current weather information from US Govt weather monitoring system.
 
+![alt text](example2.png)
+
+![alt text](example.png)
+
 setup to provide zip code in command line 
 ex: weather_zip 10004
 
